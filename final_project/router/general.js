@@ -4,23 +4,14 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-const doesExist = (username) => {
-    let userswithsamename = users.filter((user) => {
-        return user.username === username
-    });
-    if (userswithsamename.length > 0) {
-        return true;
-    } else {
-        return false;
-    }
-}
+/***** I need help with Task 10, 11, 12, 13 *****/
 
 public_users.post("/register", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
     if (username && password) {
-        if (!doesExist(username)) {
+        if (isValid(username)) {
             users.push({ "username": username, "password": password });
             return res.status(200).json({ message: "User successfully registred. Now you can login" });
         } else {
@@ -52,7 +43,7 @@ public_users.get('/author/:author', function (req, res) {
             booksByAuthor.push(book);
         }
     }
-    
+
     if (booksByAuthor.length > 0) {
         res.send(booksByAuthor);
     } else {
@@ -71,7 +62,7 @@ public_users.get('/title/:title', function (req, res) {
             booksByTitle.push(book);
         }
     }
-    
+
     if (booksByTitle.length > 0) {
         res.send(booksByTitle);
     } else {
@@ -82,7 +73,11 @@ public_users.get('/title/:title', function (req, res) {
 //  Get book review
 public_users.get('/review/:isbn', function (req, res) {
     const isbn = req.params.isbn;
-    res.send(books[isbn].reviews);
+    if (Object.keys(books[isbn].reviews).length > 0) {
+        res.send({ reviews: books[isbn].reviews });
+    } else {
+        res.status(404).send({ message: "No reviews added for this book" });
+    }
 });
 
 module.exports.general = public_users;
